@@ -172,8 +172,14 @@ class Summarizer:
                 result['date'] = line.replace('Date:', '').strip()
             elif line.startswith('Title:'):
                 current_section = 'title'
+                title_text = line.replace('Title:', '').strip()
+                if title_text:
+                    result['title'] = title_text
             elif line.startswith('Summary:'):
                 current_section = 'summary'
+                summary_text_inline = line.replace('Summary:', '').strip()
+                if summary_text_inline:
+                    summary_lines.append(summary_text_inline)
             elif line.startswith('Links:') or line.startswith('Sources:'):
                 current_section = 'links'
             elif line.startswith('http'):
