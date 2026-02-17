@@ -1,0 +1,26 @@
+# RSS Feed Sources for AI News Aggregation
+
+sources:
+  aibusiness:
+    name: "AI Business"
+    url: "https://aibusiness.com/feed"
+    enabled: true
+    priority: high
+    
+  ainews:
+    name: "AI News"
+    url: "https://www.artificialintelligence-news.com/feed/"
+    enabled: true
+    priority: high
+    
+  venturebeat:
+    name: "VentureBeat AI"
+    url: "https://venturebeat.com/category/ai/feed/"
+    enabled: true
+    priority: high
+
+# Configuration
+settings:
+  fetch_hours: 24           # How far back to fetch articles
+  max_articles_per_source: 50
+  timeout_seconds: 30

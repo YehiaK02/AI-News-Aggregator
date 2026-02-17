@@ -1,0 +1,221 @@
+# Category Classification Rules
+# Based on analysis of 8 newsletters (Nov 2025 - Jan 2026)
+
+categories:
+  
+  # ========== TIER 1: AUTO-PROCESS (High Priority) ==========
+  
+  model_releases:
+    tier: 1
+    description: "New AI models, benchmarks, architectural innovations"
+    keywords:
+      required: [model, release, launch, unveil]
+      strong: 
+        - gpt
+        - claude
+        - gemini
+        - llama
+        - qwen
+        - deepseek
+        - mistral
+        - baidu
+        - ernie
+        - kimi
+        - benchmark
+        - outperform
+        - reasoning
+        - multimodal
+        - frontier
+        - foundation model
+      weak: [ai, artificial intelligence, neural network]
+    exclude: [rumor, leak, speculation, prediction, concept]
+    min_confidence: 0.7
+    examples:
+      - "OpenAI Launches GPT-5.2"
+      - "Anthropic's Claude Opus 4.5 Beats Benchmarks"
+      - "DeepSeek V3.2 Challenges GPT-5"
+  
+  agentic_ai:
+    tier: 1
+    description: "Autonomous agents, multi-agent systems, workflow automation"
+    keywords:
+      required: [agent, autonomous, agentic]
+      strong:
+        - multi-agent
+        - orchestration
+        - workflow
+        - tool use
+        - long-running
+        - execution
+        - planning
+        - reasoning chain
+        - overnight
+        - autonomous coding
+        - self-improving
+      weak: [automation, assistant, copilot]
+    exclude: [simple chatbot, consumer only]
+    min_confidence: 0.7
+    examples:
+      - "Claude Code Adds Multi-Agent Orchestration"
+      - "Microsoft Agent 365 Launches"
+      - "Autonomous Coding Agents Work Overnight"
+  
+  developer_tools:
+    tier: 1
+    description: "AI coding tools, IDEs, APIs, SDKs, developer platforms"
+    keywords:
+      required: [developer, coding, api, sdk, ide]
+      strong:
+        - claude code
+        - cursor
+        - copilot
+        - windsurf
+        - github
+        - cli
+        - terminal
+        - vscode
+        - code generation
+        - devstral
+        - codex
+        - coding assistant
+      weak: [programming, software, development]
+    exclude: [tutorial, beginner, how-to, consumer]
+    min_confidence: 0.7
+    examples:
+      - "GitHub Copilot Gets Multi-File Editing"
+      - "Claude Code 2.1.0 Launches"
+      - "Windsurf Adds Agent Orchestration"
+  
+  enterprise_strategy:
+    tier: 1
+    description: "Major partnerships, acquisitions, funding, enterprise deployments"
+    keywords:
+      required: [enterprise, partnership, acquisition, funding, investment]
+      strong:
+        - billion
+        - million
+        - strategic
+        - deployment
+        - integration
+        - raises
+        - acquires
+        - announces
+        - unicorn
+        - valuation
+      weak: [business, company, deal]
+    money_signals: true
+    min_amount: 50000000  # $50M minimum
+    min_confidence: 0.7
+    examples:
+      - "Microsoft-Nvidia-Anthropic $15B Partnership"
+      - "Meta Acquires Manus for $2B"
+      - "Snowflake $200M Anthropic Deal"
+  
+  # ========== TIER 2: REVIEW QUEUE (Medium Priority) ==========
+  
+  healthcare_ai:
+    tier: 2
+    description: "Medical AI, clinical deployments (not pure research)"
+    keywords:
+      required: [healthcare, medical, clinical, patient, diagnostic]
+      strong:
+        - fda
+        - deployment
+        - hospital
+        - diagnosis
+        - treatment
+        - approved
+        - medgemma
+        - chatgpt health
+      weak: [health, doctor, medicine]
+    exclude: [research only, academic study, concept]
+    must_include_one_of: [deployment, launched, approved, partnership, enterprise]
+    min_confidence: 0.6
+  
+  robotics:
+    tier: 2
+    description: "Physical AI, robotics, embodied systems"
+    keywords:
+      required: [robot, robotics, embodied, physical ai]
+      strong:
+        - autonomous
+        - manufacturing
+        - warehouse
+        - humanoid
+        - foundation model
+        - skild
+        - cosmos
+      weak: [automation, mechanical]
+    exclude: [concept, research only, prototype only]
+    must_include_one_of: [funding, deployment, production, launched]
+    min_confidence: 0.6
+  
+  creative_tools:
+    tier: 2
+    description: "Image/video generation for enterprise use"
+    keywords:
+      required: [image, video, generation, creative, visual]
+      strong:
+        - text-to-image
+        - text-to-video
+        - diffusion
+        - enterprise
+        - api
+        - production
+        - flux
+        - runway
+        - sora
+      weak: [ai art, generative, media]
+    exclude: [consumer only, art project, personal use]
+    must_include_one_of: [enterprise, api, business, professional]
+    min_confidence: 0.6
+  
+  infrastructure:
+    tier: 2
+    description: "Chips, data centers, training efficiency"
+    keywords:
+      required: [gpu, chip, infrastructure, data center, training, inference]
+      strong:
+        - nvidia
+        - efficiency
+        - cost
+        - benchmark
+        - optimization
+        - blackwell
+        - hopper
+      weak: [hardware, compute]
+    must_include_one_of: [enterprise, benchmark, efficiency, announcement]
+    min_confidence: 0.6
+
+# ========== EXCLUSION RULES ==========
+
+excluded_topics:
+  consumer_apps:
+    keywords: [personal use, consumer, fun, creative project]
+    unless: [enterprise, business, api]
+  
+  tutorials:
+    keywords: [how to, tutorial, guide, tips, tricks]
+    unless: [developer, api, technical]
+  
+  speculation:
+    keywords: [predict, will be, future, eventually, someday, agi timeline]
+    unless: [announces, launches, releases]
+  
+  academic_only:
+    keywords: [research paper, study, academic, arxiv only]
+    unless: [deployment, product, launched, available]
+  
+  small_startups:
+    keywords: [startup, raises, funding]
+    min_amount: 50000000  # Must be $50M+ to include
+
+# ========== SCORING WEIGHTS ==========
+
+scoring:
+  required_keyword_match: 0.4      # Must match required keyword
+  strong_keyword_match: 0.3        # Bonus for strong keywords
+  weak_keyword_match: 0.1          # Small bonus for weak keywords
+  exclude_keyword_penalty: -1.0    # Auto-reject if exclude keyword
+  tier_1_threshold: 0.7            # Minimum for auto-process
+  tier_2_threshold: 0.6            # Minimum for review
