@@ -71,7 +71,7 @@ class Summarizer:
             
             # Call Groq for summarization
             response = self.groq.chat.completions.create(
-                model="llama-3.1-70b-versatile",
+                model="llama-3.3-70b-versatile",
                 messages=[
                     {"role": "system", "content": self.system_prompt},
                     {"role": "user", "content": context}
