@@ -25,21 +25,21 @@ CATEGORY DEFINITIONS:
    - Architectural innovations (MoE, Mamba-Transformer, etc.)
    - Model family updates (GPT, Claude, Gemini, Llama, Qwen, DeepSeek)
    - Open-source vs proprietary releases
-   
+
 2. agentic_ai
    - Autonomous agents, multi-agent systems
    - Workflow orchestration and automation
    - Long-running agent tasks (8+ hour sessions)
    - Tool use, function calling, MCP integration
    - Agent platforms and frameworks
-   
+
 3. developer_tools
    - AI coding assistants and IDEs (Claude Code, Cursor, Copilot, Windsurf)
    - Developer APIs and SDKs
    - CLI tools and terminal agents
    - GitHub integrations
    - Code generation platforms
-   
+
 4. enterprise_strategy
    - Major partnerships and acquisitions ($50M+)
    - Enterprise deployments and case studies
@@ -68,32 +68,32 @@ RESPONSE FORMAT:
 
 Respond ONLY with valid JSON:
 
-{
+{{
   "relevant": true/false,
   "category": "category_name" or null,
   "tier": 1 or 2 or null,
   "confidence": 0.0-1.0,
   "reason": "One sentence explaining decision",
   "key_signals": ["signal1", "signal2", "signal3"]
-}
+}}
 
 CLASSIFICATION EXAMPLES:
 
 Example 1 - ACCEPT:
 Title: "OpenAI Launches GPT-5.2 with Enhanced Reasoning"
-→ {"relevant": true, "category": "model_releases", "tier": 1, "confidence": 0.95, "reason": "Major model release from frontier lab", "key_signals": ["OpenAI", "GPT-5.2", "launches", "reasoning"]}
+-> {{"relevant": true, "category": "model_releases", "tier": 1, "confidence": 0.95, "reason": "Major model release from frontier lab", "key_signals": ["OpenAI", "GPT-5.2", "launches", "reasoning"]}}
 
 Example 2 - ACCEPT:
 Title: "Claude Code Adds Multi-Agent Parallel Workflows"
-→ {"relevant": true, "category": "agentic_ai", "tier": 1, "confidence": 0.92, "reason": "Developer tool with advanced agent orchestration", "key_signals": ["Claude Code", "multi-agent", "parallel", "workflows"]}
+-> {{"relevant": true, "category": "agentic_ai", "tier": 1, "confidence": 0.92, "reason": "Developer tool with advanced agent orchestration", "key_signals": ["Claude Code", "multi-agent", "parallel", "workflows"]}}
 
 Example 3 - REJECT:
 Title: "10 Creative Ways to Use ChatGPT for Cooking"
-→ {"relevant": false, "category": null, "tier": null, "confidence": 0.05, "reason": "Consumer tutorial without enterprise relevance", "key_signals": ["consumer", "tutorial", "cooking"]}
+-> {{"relevant": false, "category": null, "tier": null, "confidence": 0.05, "reason": "Consumer tutorial without enterprise relevance", "key_signals": ["consumer", "tutorial", "cooking"]}}
 
 Example 4 - REJECT:
 Title: "Startup Raises $5M for AI Chatbot"
-→ {"relevant": false, "category": null, "tier": null, "confidence": 0.25, "reason": "Funding below $50M threshold, no unique innovation", "key_signals": ["$5M", "startup", "chatbot"]}
+-> {{"relevant": false, "category": null, "tier": null, "confidence": 0.25, "reason": "Funding below $50M threshold, no unique innovation", "key_signals": ["$5M", "startup", "chatbot"]}}
 
 IMPORTANT GUIDELINES:
 
