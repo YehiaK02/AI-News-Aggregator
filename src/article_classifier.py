@@ -68,8 +68,20 @@ class ArticleClassifier:
                 max_tokens=500
             )
             
-            result = json.loads(response.choices[0].message.content)
-            result['article'] = article
+            raw = response.choices[0].message.content
+            result = json.loads(raw)
+
+            # Normalize keys — ensure expected fields exist with defaults
+            result = {
+                'relevant': result.get('relevant', False),
+                'category': result.get('category'),
+                'tier': result.get('tier'),
+                'confidence': float(result.get('confidence', 0)),
+                'reason': result.get('reason', ''),
+                'key_signals': result.get('key_signals', []),
+                'article': article
+            }
+
             result = self._apply_rules(result, article)
             
             logger.debug(
@@ -144,18 +156,23 @@ class ArticleClassifier:
             logger.info(f"   [{i}/{len(articles)}] {article['title'][:60]}...")
             
             classification = self.classify(article)
-            
-            if not classification['relevant']:
+
+            relevant = classification.get('relevant', False)
+            tier = classification.get('tier')
+            confidence = classification.get('confidence', 0)
+            category = classification.get('category', 'unknown')
+
+            if not relevant:
                 results['rejected'].append(classification)
-            elif classification['tier'] == 1 and classification['confidence'] >= 0.7:
+            elif tier == 1 and confidence >= 0.7:
                 results['tier1'].append(classification)
-                logger.info(f"      ✅ Tier 1: {classification['category']} ({classification['confidence']:.2f})")
-            elif classification['tier'] == 2 and classification['confidence'] >= 0.6:
+                logger.info(f"      ✅ Tier 1: {category} ({confidence:.2f})")
+            elif tier == 2 and confidence >= 0.6:
                 results['tier2'].append(classification)
-                logger.info(f"      ⚠️  Tier 2: {classification['category']} ({classification['confidence']:.2f})")
+                logger.info(f"      ⚠️  Tier 2: {category} ({confidence:.2f})")
             else:
                 results['rejected'].append(classification)
-                logger.info(f"      ❌ Rejected ({classification['confidence']:.2f})")
+                logger.info(f"      ❌ Rejected ({confidence:.2f})")
         
         logger.info(f"\n📊 Classification Results:")
         logger.info(f"   ✅ Tier 1 (auto-process): {len(results['tier1'])}")
