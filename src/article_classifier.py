@@ -160,11 +160,11 @@ class ArticleClassifier:
 
         try:
             response = self.groq.chat.completions.create(
-                model="llama-3.3-70b-versatile",
+                model="llama-3.1-8b-instant",
                 messages=[{"role": "user", "content": prompt}],
                 temperature=0.1,
                 response_format={"type": "json_object"},
-                max_tokens=200
+                max_tokens=150
             )
 
             raw = response.choices[0].message.content
