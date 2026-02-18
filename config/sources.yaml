@@ -19,6 +19,17 @@ sources:
     enabled: true
     priority: high
 
+# Source priority for duplicate resolution (lower = higher priority)
+source_priority:
+  venturebeat: 1
+  aibusiness: 2
+  ainews: 3
+
+# Duplicate detection settings
+duplicate_detection:
+  enabled: true
+  confidence_threshold: 0.8
+
 # Configuration
 settings:
   fetch_hours: 24           # How far back to fetch articles

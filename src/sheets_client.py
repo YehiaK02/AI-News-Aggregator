@@ -86,11 +86,12 @@ class SheetsClient:
                 data.get('sources', ''),
                 data.get('source_count', 0),
                 data.get('confidence', ''),
-                datetime.now().isoformat()
+                datetime.now().isoformat(),
+                data.get('duplicate_count', 1)
             ]
-            
+
             # Append to sheet
-            range_name = f"{sheet_name}!A:I"
+            range_name = f"{sheet_name}!A:J"
             
             body = {'values': [row]}
             
@@ -240,7 +241,8 @@ class SheetsClient:
                 'Sources',
                 'Source Count',
                 'Confidence',
-                'Processed At'
+                'Processed At',
+                'Duplicate Count'
             ],
             'Review Queue': [
                 'Date',

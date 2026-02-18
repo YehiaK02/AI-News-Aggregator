@@ -142,6 +142,113 @@ class ArticleClassifier:
             'article': article
         }
     
+    def _is_duplicate(self, title1: str, title2: str, threshold: float = 0.8) -> bool:
+        """Check if two articles are about the same news event using Groq"""
+        prompt = (
+            "Are these two article titles about the same news event?\n\n"
+            f"Title 1: {title1}\n"
+            f"Title 2: {title2}\n\n"
+            "Consider them the same event if they're reporting on the same:\n"
+            "- Product launch/announcement\n"
+            "- Funding round/acquisition\n"
+            "- Partnership/deal\n"
+            "- Research release\n\n"
+            "Respond ONLY with JSON:\n"
+            '{{"same_event": true/false, "confidence": 0.0-1.0, '
+            '"reason": "brief explanation"}}'
+        )
+
+        try:
+            response = self.groq.chat.completions.create(
+                model="llama-3.3-70b-versatile",
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.1,
+                response_format={"type": "json_object"},
+                max_tokens=200
+            )
+
+            raw = response.choices[0].message.content
+            result = json.loads(raw)
+
+            same = result.get('same_event', False)
+            confidence = float(result.get('confidence', 0))
+
+            if same and confidence >= threshold:
+                logger.debug(
+                    f"Duplicate detected ({confidence:.2f}): "
+                    f"'{title1[:40]}...' ~ '{title2[:40]}...'"
+                )
+                return True
+            return False
+
+        except Exception as e:
+            logger.warning(f"Duplicate check failed, treating as unique: {e}")
+            return False
+
+    def detect_duplicates(
+        self,
+        tier1_articles: List[Dict],
+        source_priority: Dict[str, int],
+        threshold: float = 0.8
+    ) -> List[List[Dict]]:
+        """Detect duplicate articles and group them together"""
+        if not tier1_articles:
+            return []
+
+        groups = []
+        processed = set()
+
+        logger.info(f"\n🔍 Checking {len(tier1_articles)} articles for duplicates...")
+
+        for i, article1 in enumerate(tier1_articles):
+            if i in processed:
+                continue
+
+            group = [article1]
+
+            for j, article2 in enumerate(tier1_articles[i + 1:], i + 1):
+                if j in processed:
+                    continue
+
+                title1 = article1['article'].get('title', '')
+                title2 = article2['article'].get('title', '')
+
+                if self._is_duplicate(title1, title2, threshold):
+                    group.append(article2)
+                    processed.add(j)
+
+            groups.append(group)
+
+        # Select primary for each group and log results
+        result_groups = []
+        for group in groups:
+            # Sort by source priority (lower = better), then by summary length (longer = better)
+            group.sort(key=lambda x: (
+                source_priority.get(x['article'].get('source', ''), 999),
+                -len(x['article'].get('summary', ''))
+            ))
+            result_groups.append(group)
+
+            if len(group) > 1:
+                primary = group[0]['article']
+                dup_titles = [g['article']['title'][:50] for g in group[1:]]
+                logger.info(
+                    f"   🔗 Found {len(group)} duplicates: "
+                    f"Primary: '{primary['title'][:50]}...' "
+                    f"({primary.get('source', 'unknown')})"
+                )
+                for title in dup_titles:
+                    logger.info(f"      ↳ Duplicate: '{title}...'")
+
+        unique_count = sum(1 for g in result_groups if len(g) == 1)
+        merged_count = sum(1 for g in result_groups if len(g) > 1)
+        logger.info(f"\n📊 Duplicate Detection Results:")
+        logger.info(f"   Unique articles: {unique_count}")
+        logger.info(f"   Merged groups: {merged_count}")
+        logger.info(f"   Total articles after merging: {len(result_groups)}\n")
+
+        return result_groups
+
     def classify_batch(self, articles: List[Dict]) -> Dict[str, List[Dict]]:
         """Classify multiple articles and sort into tiers"""
         results = {
