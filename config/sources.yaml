@@ -3,7 +3,7 @@
 sources:
   aibusiness:
     name: "AI Business"
-    url: "https://aibusiness.com/feed"
+    url: "https://aibusiness.com/rss.xml"
     enabled: true
     priority: high
     
@@ -15,7 +15,7 @@ sources:
     
   venturebeat:
     name: "VentureBeat AI"
-    url: "https://venturebeat.com/category/ai/feed/"
+    url: "https://venturebeat.com/feed/"
     enabled: true
     priority: high
 
