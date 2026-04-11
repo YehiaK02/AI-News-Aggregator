@@ -48,51 +48,95 @@ class Summarizer:
             logger.error(f"Error loading system prompt: {e}")
             return ""
     
+    SUMMARY_WORD_LIMIT = 200
+    MAX_RETRIES = 2
+
+    def _count_words(self, text: str) -> int:
+        """Count words in a string"""
+        return len(text.split())
+
     def summarize(
         self,
         article: Dict,
         related_sources: List[Dict]
     ) -> Dict:
         """
-        Generate comprehensive summary for an article
-        
+        Generate comprehensive summary for an article.
+        Retries up to MAX_RETRIES times if the summary exceeds SUMMARY_WORD_LIMIT.
+
         Args:
             article: Main article with title, content, url
             related_sources: List of related sources from research
-            
+
         Returns:
             Summary dictionary with formatted output
         """
         try:
             # Build context from main article and sources
             context = self._build_context(article, related_sources)
-            
-            logger.debug(f"Generating summary for: {article.get('title', 'Unknown')[:50]}...")
-            
-            # Call Groq for summarization
-            response = self.groq.chat.completions.create(
-                model="llama-3.3-70b-versatile",
-                messages=[
-                    {"role": "system", "content": self.system_prompt},
-                    {"role": "user", "content": context}
-                ],
-                temperature=0.3,  # Slightly higher for more natural writing
-                max_tokens=2000
-            )
-            
-            summary_text = response.choices[0].message.content
-            
-            # Parse the formatted output
-            parsed = self._parse_summary(summary_text)
-            
+            title_short = article.get('title', 'Unknown')[:50]
+
+            logger.debug(f"Generating summary for: {title_short}...")
+
+            messages = [
+                {"role": "system", "content": self.system_prompt},
+                {"role": "user", "content": context}
+            ]
+
+            for attempt in range(1, self.MAX_RETRIES + 2):  # +2: initial + retries
+                response = self.groq.chat.completions.create(
+                    model="llama-3.3-70b-versatile",
+                    messages=messages,
+                    temperature=0.3,
+                    max_tokens=2000
+                )
+
+                summary_text = response.choices[0].message.content
+                parsed = self._parse_summary(summary_text)
+                word_count = self._count_words(parsed.get('summary', ''))
+
+                if word_count <= self.SUMMARY_WORD_LIMIT:
+                    logger.debug(
+                        f"Summary generated successfully ({word_count} words, "
+                        f"attempt {attempt})"
+                    )
+                    break
+
+                logger.warning(
+                    f"Summary exceeds {self.SUMMARY_WORD_LIMIT}-word limit "
+                    f"({word_count} words, attempt {attempt}). "
+                    f"{'Retrying...' if attempt <= self.MAX_RETRIES else 'Using trimmed version.'}"
+                )
+
+                if attempt > self.MAX_RETRIES:
+                    # Final fallback: hard-truncate to the word limit
+                    words = parsed['summary'].split()
+                    parsed['summary'] = ' '.join(words[:self.SUMMARY_WORD_LIMIT])
+                    logger.warning(
+                        f"Hard-truncated summary to {self.SUMMARY_WORD_LIMIT} words "
+                        f"after {self.MAX_RETRIES} failed retries."
+                    )
+                    break
+
+                # Ask the model to trim its own output
+                messages.append({"role": "assistant", "content": summary_text})
+                messages.append({
+                    "role": "user",
+                    "content": (
+                        f"Your summary section is {word_count} words, which exceeds the "
+                        f"strict {self.SUMMARY_WORD_LIMIT}-word maximum. "
+                        f"Rewrite ONLY the Summary section to be {self.SUMMARY_WORD_LIMIT} words "
+                        f"or fewer while keeping the Date, Title, and Links unchanged. "
+                        f"Output the full formatted response again."
+                    )
+                })
+
             # Add metadata
             parsed['original_url'] = article.get('url', '')
             parsed['source_count'] = len(related_sources)
-            
-            logger.debug(f"Summary generated successfully")
-            
+
             return parsed
-            
+
         except Exception as e:
             logger.error(f"Error generating summary: {e}")
             raise

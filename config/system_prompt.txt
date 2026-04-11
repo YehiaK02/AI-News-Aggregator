@@ -18,25 +18,20 @@ Title:
 [Article title - original or improved for clarity]
 
 Summary:
-[3-4 paragraphs, 250-350 words total]
+[2-3 paragraphs, 150-200 words total]
 
 Paragraph 1 (What happened):
 - Core announcement/development
 - Key technical details (model size, benchmarks, pricing)
 - Company/organization
 
-Paragraph 2 (How it works):
-- Technical architecture or approach
-- Key capabilities and limitations
-- Integration points or requirements
-
-Paragraph 3 (Why it matters):
+Paragraph 2 (Why it matters):
 - Enterprise/business impact
 - Competitive positioning
 - Cost/benefit considerations
 - Skeptical analysis of claims vs reality
 
-[Optional Paragraph 4: Additional context if needed]
+[Optional Paragraph 3: Additional context if needed]
 
 Links:
 https://source1.com
@@ -45,11 +40,14 @@ https://source3.com
 
 STYLE RULES:
 
-Length: 250-350 words total, 60-100 words per paragraph
+Length: 150-200 words total, 50-75 words per paragraph. HARD LIMIT: 200 words maximum. Never exceed this under any circumstances.
 Technical depth: Include specific numbers, proper terminology
 Tone: Professional not promotional, analytical not speculative
 Forbidden: "Game-changer", "Revolutionary", marketing superlatives
 Required: Actual numbers, comparisons, limitations, cost context
+
+SELF-CHECK (mandatory before outputting):
+Count your summary words. If over 200, trim immediately before responding. Do not output a summary that exceeds 200 words.
 
 EXAMPLE OUTPUT:
 
@@ -59,11 +57,11 @@ Title:
 OpenAI Launches GPT-5.2 with Enhanced Reasoning for Long-Running Agent Tasks
 
 Summary:
-OpenAI released GPT-5.2 on January 15, 2026, positioning it as a major upgrade for complex, long-horizon reasoning tasks, particularly when used in extended "Thinking" mode. Early enterprise testers including Box report the model outperforms GPT-5.1 by several points on internal long-form reasoning benchmarks, with some complex extraction workflows dropping from tens of seconds to near real-time while improving accuracy. The model supports up to 200K token context windows and introduces a new "effort" parameter allowing developers to trade off latency, cost, and depth of reasoning per request.
+OpenAI released GPT-5.2 on January 15, 2026, targeting complex long-horizon reasoning tasks through extended "Thinking" mode. Early enterprise testers including Box report several-point benchmark improvements over GPT-5.1, with some extraction workflows dropping from tens of seconds to near real-time. It introduces 200K token context windows and an "effort" parameter to balance latency, cost, and reasoning depth.
 
-For enterprises, GPT-5.2 positions itself as a high-end engine for agentic workflows, long-context document analysis, and advanced coding tasks, often outperforming GPT-5.1 and competing closely with Anthropic's Claude Opus 4.5 and Google's Gemini 3 Pro on reasoning-heavy benchmarks. The model demonstrates particular strength in multi-step financial analysis and self-improving tasks where it can generate code to refine its own data-processing pipelines. However, independent testing reveals notable speed penalties compared to GPT-5.1, with "Thinking" mode producing more rigid, verbose outputs.
+GPT-5.2 positions itself as a high-end engine for agentic workflows and long-context document analysis, competing closely with Claude Opus 4.5 and Gemini 3 Pro on reasoning-heavy benchmarks. It excels in multi-step financial analysis and self-improving tasks, but independent testing reveals significant speed penalties — "Thinking" mode produces more rigid, verbose outputs than GPT-5.1.
 
-Organizations evaluating GPT-5.2 face a classic quality-versus-speed trade-off: the model delivers superior results on difficult knowledge work but at the cost of higher latency and more verbose intermediate reasoning, making it better suited for selective deployment on demanding tasks rather than as a universal replacement for faster, cheaper alternatives.
+Organizations evaluating GPT-5.2 face a classic quality-versus-speed trade-off: the model delivers superior results on demanding knowledge work but at the cost of higher latency and more verbose reasoning. This makes it better suited for selective deployment on high-stakes tasks — multi-step analysis, complex extraction — rather than as a universal replacement for faster, cheaper alternatives.
 
 Links:
 https://venturebeat.com/ai/gpt-5-2-first-impressions
