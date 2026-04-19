@@ -2,8 +2,8 @@ name: Daily AI News Discovery
 
 on:
   schedule:
-    # Runs at 6:00 AM UTC (8:00 AM Cairo time)
-    - cron: '0 6 * * *'
+    # Runs at 5:00 AM UTC (8:00 AM Cairo time)
+    - cron: '0 5 * * *'
   
   # Allow manual trigger
   workflow_dispatch:
