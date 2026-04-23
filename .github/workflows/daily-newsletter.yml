@@ -1,0 +1,66 @@
+# Runs 2 hours after daily-discovery.yml, giving time for article publishing review.
+name: Daily AI News Newsletter
+
+on:
+  schedule:
+    # Runs at 8:00 AM UTC (10:00 AM Cairo time)
+    - cron: '0 8 * * *'
+
+  # Allow manual trigger with optional flags
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Render preview.html only, do not send emails or update sheet'
+        type: boolean
+        default: false
+      test_email:
+        description: 'Send one real email to this address only; do not mark articles as sent'
+        type: string
+        default: ''
+
+# Prevent parallel runs
+concurrency:
+  group: newsletter-send
+  cancel-in-progress: false
+
+jobs:
+  send-newsletter:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Send newsletter
+        env:
+          GOOGLE_SHEETS_CREDENTIALS: ${{ secrets.GOOGLE_SHEETS_CREDENTIALS }}
+          GOOGLE_SHEET_ID: ${{ secrets.GOOGLE_SHEET_ID }}
+          SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
+        run: |
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            python src/newsletter.py --dry-run
+          elif [ -n "${{ inputs.test_email }}" ]; then
+            python src/newsletter.py --test-email "${{ inputs.test_email }}"
+          else
+            python src/newsletter.py
+          fi
+
+      - name: Workflow Summary
+        if: always()
+        run: |
+          echo "### Daily Newsletter - Run Summary 📬" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Execution Time:** $(date)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Status:** ${{ job.status }}" >> $GITHUB_STEP_SUMMARY

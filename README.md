@@ -110,6 +110,34 @@ ai-news-aggregator/
 
 ---
 
+## 📬 Daily Newsletter
+
+Runs via `.github/workflows/daily-newsletter.yml` at 8 AM UTC (10 AM Cairo).
+
+Sends an HTML digest of all `published=yes` articles not yet sent, to all
+`active` subscribers. Marks articles as sent (column L) only if ≥1 email
+delivery succeeded.
+
+### Local testing
+
+```bash
+# Preview HTML without sending
+python src/newsletter.py --dry-run
+# Writes preview.html and preview.txt to repo root
+
+# Send real email to just one address (for first-send verification)
+python src/newsletter.py --test-email you@example.com
+# Does NOT mark articles as sent
+```
+
+### Secrets required
+
+- `SENDGRID_API_KEY` — from SendGrid dashboard
+- `GOOGLE_SHEETS_CREDENTIALS` — shared with discovery pipeline
+- `GOOGLE_SHEET_ID` — shared with discovery pipeline
+
+---
+
 ## ⚙️ Customization
 
 ### Change Schedule
